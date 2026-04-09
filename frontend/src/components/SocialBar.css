@@ -1,0 +1,73 @@
+/* SocialBar.css */
+.social-bar-overlay {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 9999; /* Above everything */
+  background: var(--color-bg-card, #1e1e2d);
+  border-top: 1px solid var(--color-border, #2d2d3f);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  transform: translateY(0);
+  animation: slideUpSocialBar 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0;
+}
+
+@keyframes slideUpSocialBar {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.social-bar-inner {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 2.5rem;
+  min-height: 50px;
+}
+
+.social-bar-close-btn {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  line-height: 1;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s;
+  z-index: 10;
+}
+
+.social-bar-close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.social-bar-content {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* If the script injects an iframe, ensure it's not overflowing */
+.social-bar-content iframe {
+  max-width: 100%;
+  border: none;
+}

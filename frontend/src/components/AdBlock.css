@@ -1,0 +1,145 @@
+/* ── AdBlock v2 — Dynamic Placement Ad Container ──────────────────────────── */
+
+.ad-block-container {
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  transition: min-height 0.3s ease, opacity 0.4s ease;
+  cursor: default;
+}
+
+/* ── Shimmer placeholder (prevents CLS) ────────────────────── */
+.ad-block-placeholder {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-2, rgba(255, 255, 255, 0.02)) 25%,
+    var(--color-surface-3, rgba(255, 255, 255, 0.05)) 50%,
+    var(--color-surface-2, rgba(255, 255, 255, 0.02)) 75%
+  );
+  background-size: 800px 100%;
+  border: 1px dashed var(--color-border, rgba(255, 255, 255, 0.08));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  animation: ad-shimmer 1.8s infinite linear;
+}
+
+.ad-block-placeholder::after {
+  content: 'Advertisement';
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--color-text-muted, rgba(255, 255, 255, 0.18));
+  pointer-events: none;
+  user-select: none;
+}
+
+@keyframes ad-shimmer {
+  0%   { background-position: -800px 0; }
+  100% { background-position: 800px 0; }
+}
+
+/* ── Loaded state ─────────────────────────────────────── */
+.ad-block-loaded {
+  background: transparent;
+  border: none;
+  animation: ad-fade-in 0.4s ease forwards;
+}
+
+@keyframes ad-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ad-block-inner {
+  width: 100%;
+  min-height: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Fix network ad element widths */
+.ad-block-inner ins,
+.ad-block-inner iframe,
+.ad-block-inner > div {
+  width: 100% !important;
+  max-width: 100%;
+}
+
+/* ── Fallback: no ad / blocked script ─────────────────── */
+.ad-block-fallback {
+  background: rgba(99, 102, 241, 0.04);
+  border: 1px dashed rgba(99, 102, 241, 0.2);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  animation: ad-fade-in 0.4s ease forwards;
+}
+
+.ad-block-fallback-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+  margin: 0;
+  font-style: italic;
+}
+
+/* ── Adblock notice banner ────────────────────────────── */
+.ad-block-adblock-notice {
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.06) 0%,
+    rgba(245, 158, 11, 0.03) 100%
+  );
+  border: 1px solid rgba(245, 158, 11, 0.18);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-5);
+  animation: ad-fade-in 0.4s ease forwards;
+}
+
+.ad-block-adblock-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ad-block-adblock-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.ad-block-adblock-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ── Responsive ──────────────────────────────────────── */
+@media (max-width: 768px) {
+  .ad-block-container {
+    border-radius: var(--radius-sm);
+  }
+
+  .ad-block-adblock-notice {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .ad-block-adblock-text {
+    font-size: var(--font-size-xs);
+  }
+
+  .ad-block-fallback {
+    padding: var(--space-3) var(--space-4);
+    min-height: 50px;
+  }
+}

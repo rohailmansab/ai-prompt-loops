@@ -1,0 +1,39 @@
+{
+  "name": "ai-prompt-hub-backend",
+  "version": "1.0.0",
+  "description": "AI Prompt Engineering Hub - Backend API",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "migrate": "node src/scripts/migrate.js",
+    "seed-content": "node src/config/seed-content.js"
+  },
+  "keywords": [
+    "ai",
+    "prompt",
+    "engineering"
+  ],
+  "author": "AI Prompt Hub",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.3.0",
+    "express-validator": "^7.3.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.10.1",
+    "multer": "^2.1.1",
+    "mysql2": "^3.19.0",
+    "sharp": "^0.34.5",
+    "winston": "^3.19.0",
+    "winston-daily-rotate-file": "^5.0.0",
+    "xss-clean": "^0.1.4"
+  }
+}

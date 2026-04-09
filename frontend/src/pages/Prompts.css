@@ -1,0 +1,222 @@
+.prompts-hero {
+  text-align: center;
+  padding: var(--space-16) 0 var(--space-10);
+  background: var(--gradient-hero);
+}
+
+.prompts-hero h1 {
+  font-size: var(--font-size-4xl);
+  font-weight: 800;
+  margin-bottom: var(--space-3);
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.prompts-hero p {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--space-8);
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  max-width: 600px;
+  margin: 0 auto;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2) var(--space-3);
+  gap: var(--space-3);
+  transition: border-color var(--transition-fast);
+}
+
+.search-bar:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-glow);
+}
+
+.search-icon {
+  color: var(--color-text-muted);
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  background: none;
+  outline: none;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  min-width: 0; /* Prevent overflow */
+}
+
+.search-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.prompts-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: var(--space-8);
+  align-items: start;
+}
+
+.prompts-sidebar {
+  position: sticky;
+  top: calc(var(--header-height) + var(--space-6));
+}
+
+.filter-section {
+  margin-bottom: var(--space-8);
+}
+
+.filter-title {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.filter-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  transition: all var(--transition-fast);
+  text-transform: capitalize;
+  text-align: left;
+}
+
+.filter-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-primary);
+}
+
+.filter-btn.active {
+  background: var(--color-primary-glow);
+  color: var(--color-primary-light);
+  font-weight: 600;
+}
+
+.filter-count {
+  margin-left: auto;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.prompts-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--space-16) 0;
+  color: var(--color-text-tertiary);
+}
+
+.empty-state h3 {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--space-2);
+  color: var(--color-text-secondary);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  margin-top: var(--space-10);
+  flex-wrap: wrap;
+}
+
+.pagination-info {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}
+
+/* ===== Tablet ===== */
+@media (max-width: 1024px) {
+  .prompts-layout {
+    grid-template-columns: 200px 1fr;
+    gap: var(--space-6);
+  }
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 768px) {
+  .prompts-hero {
+    padding: var(--space-10) 0 var(--space-6);
+  }
+
+  .prompts-hero h1 {
+    font-size: var(--font-size-2xl);
+  }
+
+  .prompts-hero p {
+    font-size: var(--font-size-base);
+    margin-bottom: var(--space-5);
+  }
+
+  .prompts-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .prompts-sidebar {
+    position: static;
+    display: flex;
+    gap: var(--space-4);
+    overflow-x: auto;
+    padding-bottom: var(--space-4);
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .prompts-sidebar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-section {
+    min-width: 180px;
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+
+  .filter-title {
+    font-size: var(--font-size-xs);
+  }
+
+  .filter-btn {
+    padding: var(--space-2);
+    font-size: var(--font-size-xs);
+    white-space: nowrap;
+  }
+
+  .search-bar {
+    padding: var(--space-1) var(--space-2);
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-section {
+    min-width: 160px;
+  }
+}
+
+/* ── Inline Ad (list_inline) ─────────────────────────────── */
+.prompts-ad-inline {
+  padding: var(--space-2) 0;
+}

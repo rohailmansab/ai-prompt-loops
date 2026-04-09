@@ -1,0 +1,191 @@
+.tools-tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-8);
+  padding: var(--space-1);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.tools-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tool-tab {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tool-tab:hover { color: var(--color-text-primary); }
+
+.tool-tab.active {
+  background: var(--gradient-primary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.tool-panel {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+}
+
+.tool-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-8);
+}
+
+.tool-form h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--space-2);
+}
+
+.tool-desc {
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--space-6);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.tool-output {
+  display: flex;
+  flex-direction: column;
+}
+
+.output-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.output-header h3 {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+}
+
+.output-content {
+  flex: 1;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  min-height: 300px;
+  overflow: hidden;
+}
+
+.output-text {
+  padding: var(--space-5);
+  font-family: 'Fira Code', monospace;
+  font-size: var(--font-size-sm);
+  line-height: 1.8;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  color: var(--color-text-secondary);
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.output-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 300px;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  gap: var(--space-3);
+}
+
+.output-placeholder svg {
+  font-size: 32px;
+  opacity: 0.3;
+}
+
+.btn-copied {
+  background: var(--color-success) !important;
+  color: white !important;
+}
+
+/* ===== Tablet ===== */
+@media (max-width: 1024px) {
+  .tool-grid { grid-template-columns: 1fr; }
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 768px) {
+  .tool-grid { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .tool-panel { padding: var(--space-5); }
+  .tools-tabs { width: 100%; }
+  .tool-tab { 
+    flex: 1; 
+    justify-content: center; 
+    padding: var(--space-3) var(--space-4);
+  }
+  .tool-form h2 {
+    font-size: var(--font-size-xl);
+  }
+  .output-content {
+    min-height: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tool-panel { padding: var(--space-4); }
+  .tool-tab {
+    font-size: var(--font-size-xs);
+    padding: var(--space-2) var(--space-3);
+  }
+}
+
+/* §1 — Gated button (ad watch required) */
+.btn-gated {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3) !important;
+  position: relative;
+  overflow: hidden;
+}
+.btn-gated::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+  animation: shimmerBtn 2s infinite;
+}
+@keyframes shimmerBtn {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.btn-gated:hover {
+  box-shadow: 0 6px 22px rgba(245, 158, 11, 0.45) !important;
+  transform: translateY(-1px);
+}

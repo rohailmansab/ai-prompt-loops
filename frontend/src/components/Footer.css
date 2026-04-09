@@ -1,0 +1,366 @@
+/* ============================================================
+   Footer — Standard System UI Layout
+   Adheres strictly to global CSS variables and responsive patterns.
+   ============================================================ */
+
+.footer {
+  position: relative;
+  background-color: var(--color-bg);
+  border-top: 1px solid var(--color-border);
+  padding: var(--space-16) 0 0;
+  margin-top: auto;
+}
+
+/* Subtle accent line at the very top */
+.footer-glow-line {
+  position: absolute;
+  top: 0; 
+  left: 0; 
+  right: 0;
+  height: 1px;
+  background: var(--gradient-primary);
+  opacity: 0.4;
+}
+
+/* ============================================================
+   CTA Banner
+   ============================================================ */
+.footer-cta-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding: var(--space-8);
+  margin-bottom: var(--space-16);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+}
+
+.footer-cta-banner:hover {
+  border-color: var(--color-border-hover);
+  box-shadow: var(--shadow-lg);
+}
+
+.footer-cta-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.footer-cta-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-glow);
+  color: var(--color-primary-light);
+  font-size: var(--font-size-xl);
+}
+
+.footer-cta-title {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.footer-cta-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.footer-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-md);
+  background: var(--gradient-primary);
+  color: white;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
+  transition: all var(--transition-base);
+}
+
+.footer-cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(99, 102, 241, 0.45);
+  color: white;
+}
+
+/* ============================================================
+   Main Layout Grid
+   ============================================================ */
+.footer-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-10);
+  margin-bottom: var(--space-16);
+  justify-content: space-between;
+}
+
+/* ── Left: Brand Layout ── */
+.footer-brand {
+  flex: 2 1 300px;
+  max-width: 400px;
+}
+
+.footer-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-4);
+}
+
+.footer-logo .logo-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--gradient-primary);
+  color: #fff;
+}
+
+.footer-desc {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.footer-brand-badges {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.brand-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+}
+.footer-column-title {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-4);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.footer-column ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.footer-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.footer-link:hover {
+  color: var(--color-primary-light);
+}
+
+.footer-link-arrow {
+  color: var(--color-text-tertiary);
+  font-size: 1.1em;
+  transition: transform var(--transition-fast), color var(--transition-fast);
+}
+
+.footer-link:hover .footer-link-arrow {
+  color: var(--color-primary-light);
+  transform: translateX(4px);
+}
+.contact-links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.contact-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.contact-link:hover {
+  color: var(--color-primary-light);
+}
+
+.contact-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  color: var(--color-primary-light);
+}
+
+.footer-socials {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+  transition: all var(--transition-base);
+}
+
+.social-link:hover {
+  color: var(--color-primary-light);
+  border-color: var(--color-primary-glow-strong);
+  background: var(--color-bg-elevated);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ============================================================
+   Bottom Legal / Metadata Bar
+   ============================================================ */
+.footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-6) 0;
+  border-top: 1px solid var(--color-border);
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.footer-copyright {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}
+
+.footer-bottom-badges {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.footer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.footer-badge svg {
+  color: var(--color-primary-light);
+}
+
+.footer-badge-heart .heart-icon {
+  color: var(--color-error);
+}
+
+/* ============================================================
+   Responsive Tiering
+   ============================================================ */
+@media (max-width: 1024px) {
+  .footer-grid {
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: var(--space-10) var(--space-6);
+  }
+  .footer-brand {
+    grid-column: 1 / -1;
+    max-width: 100%;
+    margin-bottom: var(--space-4);
+  }
+}
+
+@media (max-width: 768px) {
+  .footer-cta-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: var(--space-6) var(--space-4);
+  }
+  .footer-cta-content {
+    flex-direction: column;
+  }
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-10);
+  }
+  .footer-column, 
+  .footer-contact {
+    min-width: 100%;
+  }
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: var(--space-6);
+  }
+  .footer-bottom-badges {
+    justify-content: flex-start;
+    gap: var(--space-3);
+  }
+}
+
+@media (max-width: 480px) {
+  .footer {
+    padding-top: var(--space-12);
+  }
+  .footer-brand-badges {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .footer-socials {
+    justify-content: flex-start;
+  }
+}

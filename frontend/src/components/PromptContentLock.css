@@ -1,0 +1,287 @@
+/* ── PromptContentLock — Content Gate Styles ─────────────────────────────── */
+
+/* ── Wrapper ─────────────────────────────────────────── */
+.pcl-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* ── Content area ─────────────────────────────────────── */
+.pcl-content-area {
+  position: relative;
+}
+
+.pcl-visible-text {
+  margin-bottom: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+/* ── Blur zone ─────────────────────────────────────────── */
+.pcl-blur-zone {
+  position: relative;
+  overflow: hidden;
+  border-bottom-left-radius: var(--radius-md);
+  border-bottom-right-radius: var(--radius-md);
+}
+
+.pcl-blurred-text {
+  filter: blur(5px);
+  user-select: none;
+  pointer-events: none;
+  max-height: 160px;
+  overflow: hidden;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  opacity: 0.6;
+}
+
+/* Gradient fade overlay */
+.pcl-blur-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(22, 22, 31, 0.0) 0%,
+    rgba(22, 22, 31, 0.92) 70%,
+    rgba(22, 22, 31, 1) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Lock badge inside blur zone */
+.pcl-lock-badge {
+  position: absolute;
+  bottom: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: rgba(10, 10, 15, 0.85);
+  border: 1px solid var(--color-border);
+  backdrop-filter: blur(12px);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.pcl-lock-icon {
+  color: var(--color-warning);
+  flex-shrink: 0;
+}
+
+/* ── Full text reveal (after unlock) ───────────────────── */
+.pcl-full-text {
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+
+.pcl-reveal-anim {
+  animation: pcl-reveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes pcl-reveal {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+/* ── Unlock CTA card ──────────────────────────────────── */
+.pcl-unlock-cta {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-2) 0 var(--space-4);
+}
+
+.pcl-unlock-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: 400px;
+  width: 100%;
+  padding: var(--space-6) var(--space-8);
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.08) 0%,
+    rgba(139, 92, 246, 0.05) 100%
+  );
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  animation: pcl-cta-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes pcl-cta-in {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.pcl-unlock-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--color-primary-glow);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pcl-unlock-eye {
+  color: var(--color-primary-light);
+  font-size: 1.3rem;
+}
+
+.pcl-unlock-title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.pcl-unlock-desc {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.pcl-unlock-btn {
+  margin-top: var(--space-2);
+  padding: var(--space-3) var(--space-8) !important;
+  font-size: var(--font-size-sm) !important;
+  width: 100%;
+  max-width: 260px;
+}
+
+/* ── Ad countdown phase ─────────────────────────────── */
+.pcl-ad-phase {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.05) 0%,
+    rgba(139, 92, 246, 0.03) 100%
+  );
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: var(--radius-lg);
+  animation: pcl-cta-in 0.4s ease forwards;
+}
+
+.pcl-ad-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.pcl-ad-countdown {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.pcl-ad-progress-track {
+  height: 4px;
+  background: rgba(99, 102, 241, 0.12);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: var(--space-2);
+}
+
+.pcl-ad-progress-fill {
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-full);
+  transition: width 0.9s linear; /* smooth step between 1s ticks */
+}
+
+.pcl-ad-status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.pcl-ad-timer {
+  font-size: var(--font-size-sm);
+  color: var(--color-primary-light);
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+/* §2 — Paused: ad not visible, timer suspended */
+.pcl-timer-paused {
+  color: var(--color-warning) !important;
+  animation: pcl-pulse-warn 1.4s ease-in-out infinite;
+}
+
+@keyframes pcl-pulse-warn {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+.pcl-ad-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.pcl-unlock-ad {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+/* ── Action buttons row ─────────────────────────────── */
+.pcl-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.pcl-copy-locked {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+}
+
+.pcl-copy-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* ── Mobile ─────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .pcl-unlock-card {
+    padding: var(--space-5) var(--space-5);
+  }
+
+  .pcl-unlock-btn {
+    max-width: 100%;
+  }
+
+  .pcl-ad-phase {
+    padding: var(--space-3);
+  }
+
+  .pcl-blurred-text {
+    max-height: 100px;
+  }
+}
