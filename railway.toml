@@ -1,0 +1,11 @@
+# When service builds from repo root, this picks the root Dockerfile.
+# Optional: set service Root Directory to `backend` and remove this file —
+# then `backend/Dockerfile` is used instead.
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "npm start"
+restartPolicyType = "ON_FAILURE"
