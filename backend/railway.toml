@@ -1,0 +1,8 @@
+# Railway deploy — set service root to this `backend` folder (monorepo).
+# Dashboard: Variables → add DB_*, JWT_*, NODE_ENV=production, FRONTEND_URL, SITE_URL.
+
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "npm start"

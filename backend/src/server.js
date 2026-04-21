@@ -224,7 +224,7 @@ const start = async () => {
       logger.warn('⚠️  Starting without database - some features will be unavailable');
     }
 
-    server = app.listen(PORT, () => {
+    server = app.listen(PORT, '0.0.0.0', () => {
       logger.info(`🚀 AI Prompt Hub API running on port ${PORT}`);
       logger.info(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(`\n🚀 AI Prompt Hub API running on port ${PORT}`);
