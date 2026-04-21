@@ -9,7 +9,7 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { testConnection, initializeDatabase, getDbConfigSummary, pool } from './config/database.js';
+import { testConnection, initializeDatabase, getDbConfigSummary, getDbEnvPresence, pool } from './config/database.js';
 import seedDatabase from './config/seed.js';
 import { validateEnvironment } from './config/validateEnv.js';
 import logger from './config/logger.js';
@@ -225,6 +225,8 @@ app.get('/api/health', async (req, res) => {
       ok: dbOk,
       ...(mysqlCode ? { mysqlCode } : {}),
       target: summary,
+      /** All false = no DB vars on this Railway service — add MYSQL_PUBLIC_URL or DB_* here */
+      envPresent: getDbEnvPresence(),
     },
   });
 });

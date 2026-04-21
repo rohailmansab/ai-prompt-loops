@@ -36,18 +36,49 @@ function shouldUseMysqlSsl(host) {
 }
 
 function buildPoolOptions() {
+  // Railway / templates use different names (MYSQLHOST vs MYSQL_HOST). Read all sane fallbacks.
   const fromUrl =
     parseMysqlUrl(process.env.DATABASE_URL) ||
     parseMysqlUrl(process.env.MYSQL_PUBLIC_URL) ||
+    parseMysqlUrl(process.env.MYSQL_PRIVATE_URL) ||
     parseMysqlUrl(process.env.MYSQL_URL);
 
-  const host = fromUrl?.host || process.env.DB_HOST || process.env.MYSQLHOST || 'localhost';
-  const port = fromUrl?.port || parseInt(process.env.DB_PORT || process.env.MYSQLPORT || '3306', 10) || 3306;
-  const user = fromUrl?.user || process.env.DB_USER || process.env.MYSQLUSER || 'root';
+  const host =
+    fromUrl?.host ||
+    process.env.DB_HOST ||
+    process.env.MYSQLHOST ||
+    process.env.MYSQL_HOST ||
+    'localhost';
+
+  const portRaw =
+    fromUrl?.port ||
+    process.env.DB_PORT ||
+    process.env.MYSQLPORT ||
+    process.env.MYSQL_PORT ||
+    '3306';
+  const port = parseInt(String(portRaw), 10) || 3306;
+
+  const user =
+    fromUrl?.user ||
+    process.env.DB_USER ||
+    process.env.MYSQLUSER ||
+    process.env.MYSQL_USER ||
+    'root';
+
   const password =
-    fromUrl?.password ?? process.env.DB_PASSWORD ?? process.env.MYSQLPASSWORD ?? process.env.MYSQL_ROOT_PASSWORD ?? '';
+    fromUrl?.password ??
+    process.env.DB_PASSWORD ??
+    process.env.MYSQLPASSWORD ??
+    process.env.MYSQL_PASSWORD ??
+    process.env.MYSQL_ROOT_PASSWORD ??
+    '';
+
   const database =
-    fromUrl?.database || process.env.DB_NAME || process.env.MYSQLDATABASE || process.env.MYSQL_DATABASE || 'ai_prompt_hub';
+    fromUrl?.database ||
+    process.env.DB_NAME ||
+    process.env.MYSQLDATABASE ||
+    process.env.MYSQL_DATABASE ||
+    'ai_prompt_hub';
 
   const ssl = shouldUseMysqlSsl(host) ? { rejectUnauthorized: false } : undefined;
 
@@ -76,9 +107,35 @@ export const getDbConfigSummary = () => ({
   port: poolOptions.port,
   database: poolOptions.database,
   ssl: Boolean(poolOptions.ssl),
-  source: parseMysqlUrl(process.env.DATABASE_URL || process.env.MYSQL_PUBLIC_URL || process.env.MYSQL_URL)
-    ? 'mysql_url'
-    : 'split_env',
+  source:
+    parseMysqlUrl(
+      process.env.DATABASE_URL ||
+        process.env.MYSQL_PUBLIC_URL ||
+        process.env.MYSQL_PRIVATE_URL ||
+        process.env.MYSQL_URL
+    )
+      ? 'mysql_url'
+      : 'split_env',
+});
+
+/** Booleans only — helps see if Railway injected any DB vars into THIS service. */
+export const getDbEnvPresence = () => ({
+  DATABASE_URL: Boolean(process.env.DATABASE_URL),
+  MYSQL_PUBLIC_URL: Boolean(process.env.MYSQL_PUBLIC_URL),
+  MYSQL_PRIVATE_URL: Boolean(process.env.MYSQL_PRIVATE_URL),
+  MYSQL_URL: Boolean(process.env.MYSQL_URL),
+  DB_HOST: Boolean(process.env.DB_HOST),
+  MYSQLHOST: Boolean(process.env.MYSQLHOST),
+  MYSQL_HOST: Boolean(process.env.MYSQL_HOST),
+  DB_PORT: Boolean(process.env.DB_PORT || process.env.MYSQLPORT || process.env.MYSQL_PORT),
+  DB_USER: Boolean(process.env.DB_USER || process.env.MYSQLUSER || process.env.MYSQL_USER),
+  DB_PASSWORD: Boolean(
+    process.env.DB_PASSWORD ||
+      process.env.MYSQLPASSWORD ||
+      process.env.MYSQL_PASSWORD ||
+      process.env.MYSQL_ROOT_PASSWORD
+  ),
+  DB_NAME: Boolean(process.env.DB_NAME || process.env.MYSQLDATABASE || process.env.MYSQL_DATABASE),
 });
 
 export const testConnection = async () => {
