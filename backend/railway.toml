@@ -1,8 +1,10 @@
-# Railway deploy — set service root to this `backend` folder (monorepo).
-# Dashboard: Variables → add DB_*, JWT_*, NODE_ENV=production, FRONTEND_URL, SITE_URL.
+# Monorepo: Railway service "Root Directory" MUST be `backend`.
+# Uses Dockerfile so Railpack/Nixpacks auto-detect issues are avoided.
 
 [build]
-builder = "NIXPACKS"
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
 
 [deploy]
 startCommand = "npm start"
+restartPolicyType = "ON_FAILURE"
