@@ -29,6 +29,16 @@ export const validateEnvironment = () => {
   const missing = [];
   const warnings = [];
 
+  // Mirror URLs if only one is set (common Railway / Vercel typo)
+  if (process.env.NODE_ENV === 'production') {
+    if (!process.env.SITE_URL?.trim() && process.env.FRONTEND_URL?.trim()) {
+      process.env.SITE_URL = process.env.FRONTEND_URL.trim();
+    }
+    if (!process.env.FRONTEND_URL?.trim() && process.env.SITE_URL?.trim()) {
+      process.env.FRONTEND_URL = process.env.SITE_URL.trim();
+    }
+  }
+
   // Check required variables
   for (const key of REQUIRED_VARS) {
     if (!process.env[key]) {
