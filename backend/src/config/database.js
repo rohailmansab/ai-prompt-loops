@@ -3,29 +3,71 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Railway MySQL proxy (*.rlwy.net / *.proxy.rlwy.net) normally requires TLS.
-function shouldUseMysqlSsl() {
-  if (process.env.DB_SSL === 'false') return false;
-  if (process.env.DB_SSL === 'true') return true;
-  const host = process.env.DB_HOST || '';
-  return /\.rlwy\.net$/i.test(host) || /\.railway\.internal$/i.test(host);
+/**
+ * Railway often sets MYSQL_PUBLIC_URL / DATABASE_URL as a full mysql:// string.
+ * Parse it so host/port/db/password always match what Railway expects.
+ */
+function parseMysqlUrl(raw) {
+  if (!raw || typeof raw !== 'string') return null;
+  const s = raw.trim();
+  if (!/^mysql:\/\//i.test(s)) return null;
+  try {
+    const u = new URL(s);
+    const db = u.pathname.replace(/^\//, '').split('?')[0];
+    return {
+      host: u.hostname,
+      port: u.port ? parseInt(u.port, 10) : 3306,
+      user: decodeURIComponent(u.username || 'root'),
+      password: decodeURIComponent(u.password || ''),
+      database: db || 'railway',
+    };
+  } catch {
+    return null;
+  }
 }
 
-const ssl = shouldUseMysqlSsl() ? { rejectUnauthorized: false } : undefined;
+/** Public Railway TCP proxies need TLS; internal *.railway.internal usually does not. */
+function shouldUseMysqlSsl(host) {
+  if (!host) return false;
+  if (process.env.DB_SSL === 'false') return false;
+  if (process.env.DB_SSL === 'true') return true;
+  if (/\.railway\.internal$/i.test(host)) return false;
+  return /\.rlwy\.net$/i.test(host) || /\.railway\.app$/i.test(host);
+}
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT, 10) || 3306,
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'ai_prompt_hub',
-  ...(ssl ? { ssl } : {}),
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-  enableKeepAlive: true,
-  keepAliveInitialDelay: 0,
-});
+function buildPoolOptions() {
+  const fromUrl =
+    parseMysqlUrl(process.env.DATABASE_URL) ||
+    parseMysqlUrl(process.env.MYSQL_PUBLIC_URL) ||
+    parseMysqlUrl(process.env.MYSQL_URL);
+
+  const host = fromUrl?.host || process.env.DB_HOST || process.env.MYSQLHOST || 'localhost';
+  const port = fromUrl?.port || parseInt(process.env.DB_PORT || process.env.MYSQLPORT || '3306', 10) || 3306;
+  const user = fromUrl?.user || process.env.DB_USER || process.env.MYSQLUSER || 'root';
+  const password =
+    fromUrl?.password ?? process.env.DB_PASSWORD ?? process.env.MYSQLPASSWORD ?? process.env.MYSQL_ROOT_PASSWORD ?? '';
+  const database =
+    fromUrl?.database || process.env.DB_NAME || process.env.MYSQLDATABASE || process.env.MYSQL_DATABASE || 'ai_prompt_hub';
+
+  const ssl = shouldUseMysqlSsl(host) ? { rejectUnauthorized: false } : undefined;
+
+  return {
+    host,
+    port,
+    user,
+    password,
+    database,
+    ...(ssl ? { ssl } : {}),
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 0,
+    connectTimeout: 20000,
+  };
+}
+
+const pool = mysql.createPool(buildPoolOptions());
 
 export const testConnection = async () => {
   try {

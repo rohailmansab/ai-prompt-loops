@@ -34,7 +34,15 @@ export const getPageBySlug = async (req, res, next) => {
 
     const page = rows[0];
 
-    if (!page.is_published) {
+    // MySQL tinyint / driver types: normalize so 1 is published
+    const pub = page.is_published;
+    const isLive =
+      pub === true ||
+      pub === 1 ||
+      pub === '1' ||
+      (Buffer.isBuffer(pub) && pub.length && pub[0] === 1);
+
+    if (!isLive) {
       return res.status(404).json({ error: 'Page not found' });
     }
 
