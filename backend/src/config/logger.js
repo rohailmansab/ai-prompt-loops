@@ -43,8 +43,14 @@ const logger = winston.createLogger({
   ]
 });
 
-// Write to console in development or if explicitly requested
-if (process.env.NODE_ENV !== 'production' || process.env.LOG_TO_CONSOLE === 'true') {
+// Write to console in dev, or production on PaaS (Railway/Render capture stdout).
+const logToConsole =
+  process.env.NODE_ENV !== 'production' ||
+  process.env.LOG_TO_CONSOLE === 'true' ||
+  process.env.RAILWAY_ENVIRONMENT ||
+  process.env.RENDER;
+
+if (logToConsole) {
   logger.add(new winston.transports.Console({
     format: combine(
       colorize(),

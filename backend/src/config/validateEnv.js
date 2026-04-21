@@ -16,11 +16,8 @@ const REQUIRED_VARS = [
   'JWT_REFRESH_SECRET',
 ];
 
-const PRODUCTION_REQUIRED = [
-  'RECAPTCHA_SECRET',
-  'SITE_URL',
-  'FRONTEND_URL',
-];
+// Production must have URLs for CORS/SEO; reCAPTCHA can be added later (contact form).
+const PRODUCTION_REQUIRED = ['SITE_URL', 'FRONTEND_URL'];
 
 const RECOMMENDED_VARS = [
   'DB_PASSWORD',
