@@ -32,6 +32,14 @@ import { generateSitemap, generateRobotsTxt } from './controllers/seoController.
 
 dotenv.config();
 
+// Crash diagnostics on PaaS (shows real error in Railway logs)
+process.on('unhandledRejection', (reason) => {
+  console.error('[unhandledRejection]', reason);
+});
+process.on('uncaughtException', (err) => {
+  console.error('[uncaughtException]', err);
+});
+
 // ── Validate environment on startup ──────────────────────
 validateEnvironment();
 

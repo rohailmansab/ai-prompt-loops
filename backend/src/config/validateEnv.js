@@ -1,7 +1,6 @@
 /**
  * Environment Variable Validation
- * Validates all required environment variables are set on server start.
- * Fails fast in production if critical secrets are missing.
+ * Railway/paas: missing vars log hoti hain; crash sirf STRICT_ENV=true par (optional hard fail).
  */
 import dotenv from 'dotenv';
 import logger from './logger.js';
@@ -16,7 +15,6 @@ const REQUIRED_VARS = [
   'JWT_REFRESH_SECRET',
 ];
 
-// Production must have URLs for CORS/SEO; reCAPTCHA can be added later (contact form).
 const PRODUCTION_REQUIRED = ['SITE_URL', 'FRONTEND_URL'];
 
 const RECOMMENDED_VARS = [
@@ -29,7 +27,6 @@ export const validateEnvironment = () => {
   const missing = [];
   const warnings = [];
 
-  // Mirror URLs if only one is set (common Railway / Vercel typo)
   if (process.env.NODE_ENV === 'production') {
     if (!process.env.SITE_URL?.trim() && process.env.FRONTEND_URL?.trim()) {
       process.env.SITE_URL = process.env.FRONTEND_URL.trim();
@@ -39,52 +36,50 @@ export const validateEnvironment = () => {
     }
   }
 
-  // Check required variables
   for (const key of REQUIRED_VARS) {
-    if (!process.env[key]) {
-      missing.push(key);
-    }
+    if (!process.env[key]) missing.push(key);
   }
 
-  // Check production-only variables
   if (process.env.NODE_ENV === 'production') {
     for (const key of PRODUCTION_REQUIRED) {
-      if (!process.env[key]) {
-        missing.push(key);
-      }
-    }
-
-    // Ensure JWT_SECRET is not the default dev key
-    if (process.env.JWT_SECRET && process.env.JWT_SECRET.includes('dev_secret')) {
-      missing.push('JWT_SECRET (must not be default dev key in production)');
-    }
-    if (process.env.JWT_REFRESH_SECRET && process.env.JWT_REFRESH_SECRET.includes('dev_refresh')) {
-      missing.push('JWT_REFRESH_SECRET (must not be default dev key in production)');
+      if (!process.env[key]?.trim()) missing.push(key);
     }
   }
 
-  // Check recommended variables (warn only)
+  if (process.env.NODE_ENV === 'production' && process.env.JWT_SECRET?.includes('dev_secret')) {
+    warnings.push('JWT_SECRET contains "dev_secret" — use a fresh secret in production');
+  }
+  if (process.env.NODE_ENV === 'production' && process.env.JWT_REFRESH_SECRET?.includes('dev_refresh')) {
+    warnings.push('JWT_REFRESH_SECRET contains "dev_refresh" — use a fresh secret in production');
+  }
+
   for (const key of RECOMMENDED_VARS) {
-    if (!process.env[key]) {
-      warnings.push(key);
-    }
+    if (!process.env[key]) warnings.push(key);
   }
 
-  // Report warnings
   if (warnings.length > 0) {
-    logger.warn(`⚠️  Missing recommended env vars: ${warnings.join(', ')}`);
+    logger.warn(`⚠️  Env warnings: ${warnings.join(', ')}`);
   }
 
-  // Fail on missing required vars
   if (missing.length > 0) {
-    const msg = `❌ Missing required environment variables: ${missing.join(', ')}`;
+    const msg = `❌ Missing environment variables: ${missing.join(', ')}`;
     logger.error(msg);
-    if (process.env.NODE_ENV === 'production') {
-      console.error(msg);
+    console.error('\n========== ENV CHECK FAILED ==========');
+    console.error(msg);
+    console.error('Go to Railway → Service → Variables and add these.\n');
+
+    const strictFail = process.env.STRICT_ENV === 'true';
+    if (strictFail && process.env.NODE_ENV === 'production') {
+      console.error('STRICT_ENV=true → exiting.');
       process.exit(1);
-    } else {
-      console.warn(msg);
     }
+
+    console.error(
+      '⚠️  Starting anyway so logs stay visible. Fix variables for DB/auth.\n' +
+        '(Set STRICT_ENV=true only when you want the process to exit on missing vars.)\n'
+    );
+    console.error('========================================\n');
+    return;
   }
 
   logger.info('✅ Environment validation passed');
