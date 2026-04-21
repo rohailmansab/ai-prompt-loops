@@ -3,12 +3,23 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// Railway MySQL proxy (*.rlwy.net / *.proxy.rlwy.net) normally requires TLS.
+function shouldUseMysqlSsl() {
+  if (process.env.DB_SSL === 'false') return false;
+  if (process.env.DB_SSL === 'true') return true;
+  const host = process.env.DB_HOST || '';
+  return /\.rlwy\.net$/i.test(host) || /\.railway\.internal$/i.test(host);
+}
+
+const ssl = shouldUseMysqlSsl() ? { rejectUnauthorized: false } : undefined;
+
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT) || 3306,
+  port: parseInt(process.env.DB_PORT, 10) || 3306,
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'ai_prompt_hub',
+  ...(ssl ? { ssl } : {}),
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
