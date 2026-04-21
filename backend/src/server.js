@@ -43,6 +43,24 @@ process.on('uncaughtException', (err) => {
 // ── Validate environment on startup ──────────────────────
 validateEnvironment();
 
+// Railway: if DB env missing, pool falls back to localhost → ECONNREFUSED (health shows degraded)
+const _dbTarget = getDbConfigSummary();
+if (
+  (process.env.NODE_ENV === 'production' || process.env.RAILWAY_ENVIRONMENT) &&
+  _dbTarget.host === 'localhost'
+) {
+  console.error(
+    '\n╔════════════════════════════════════════════════════════════════╗\n' +
+      '║ RAILWAY: MySQL env vars are NOT set on THIS API service.       ║\n' +
+      '║ App falls back to localhost → DB will never connect.           ║\n' +
+      '║ Fix: Railway → click **ai-prompt-loops** (API) → Variables → ║\n' +
+      '║   Add MYSQL_PUBLIC_URL = full mysql://… from MySQL → Connect  ║\n' +
+      '║   OR add DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME.      ║\n' +
+      '║ Then Redeploy this service.                                    ║\n' +
+      '╚════════════════════════════════════════════════════════════════╝\n'
+  );
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
