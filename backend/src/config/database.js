@@ -67,7 +67,19 @@ function buildPoolOptions() {
   };
 }
 
-const pool = mysql.createPool(buildPoolOptions());
+const poolOptions = buildPoolOptions();
+const pool = mysql.createPool(poolOptions);
+
+/** Safe summary for /api/health (no secrets). */
+export const getDbConfigSummary = () => ({
+  host: poolOptions.host,
+  port: poolOptions.port,
+  database: poolOptions.database,
+  ssl: Boolean(poolOptions.ssl),
+  source: parseMysqlUrl(process.env.DATABASE_URL || process.env.MYSQL_PUBLIC_URL || process.env.MYSQL_URL)
+    ? 'mysql_url'
+    : 'split_env',
+});
 
 export const testConnection = async () => {
   try {
@@ -598,4 +610,5 @@ export const initializeDatabase = async () => {
   }
 };
 
+export { pool };
 export default pool;

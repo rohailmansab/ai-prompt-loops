@@ -9,7 +9,7 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { testConnection, initializeDatabase } from './config/database.js';
+import { testConnection, initializeDatabase, getDbConfigSummary, pool } from './config/database.js';
 import seedDatabase from './config/seed.js';
 import { validateEnvironment } from './config/validateEnv.js';
 import logger from './config/logger.js';
@@ -185,13 +185,29 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/pages', pagesRoutes);
 app.use('/api/footer', footerRoutes);
 
-// ── Health Check ─────────────────────────────────────────
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'ok',
+// ── Health Check (includes DB ping — check `db.ok` if About/API fails) ──
+app.get('/api/health', async (req, res) => {
+  const summary = getDbConfigSummary();
+  let dbOk = false;
+  let mysqlCode = null;
+  try {
+    await pool.query('SELECT 1 AS ok');
+    dbOk = true;
+  } catch (e) {
+    mysqlCode = e.code || null;
+    console.error('[health] DB ping failed:', e.code, e.message);
+  }
+
+  res.status(dbOk ? 200 : 503).json({
+    status: dbOk ? 'ok' : 'degraded',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     environment: process.env.NODE_ENV || 'development',
+    db: {
+      ok: dbOk,
+      ...(mysqlCode ? { mysqlCode } : {}),
+      target: summary,
+    },
   });
 });
 
