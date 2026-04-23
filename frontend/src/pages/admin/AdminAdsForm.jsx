@@ -88,7 +88,9 @@ const AdminAdsForm = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+    // Map neutral DOM name — ad blockers hide fields named ad_* or id ad-*
+    const key = name === 'embed_snippet' ? 'ad_code' : name;
+    setForm(prev => ({ ...prev, [key]: type === 'checkbox' ? checked : value }));
   };
 
   const handleSubmit = async (e) => {
@@ -147,14 +149,14 @@ const AdminAdsForm = () => {
         <button
           className="btn btn-ghost btn-sm"
           onClick={() => navigate('/admin/ads')}
-          id="back-to-ads"
+          id="nav-back-creative-list"
         >
           <FiArrowLeft /> Back to Ads
         </button>
       </div>
 
-      <div className="dashboard-section">
-        <form onSubmit={handleSubmit} id="ad-form">
+      <div className="dashboard-section" style={{ overflow: 'visible' }}>
+        <form onSubmit={handleSubmit} id="form-creative-embed">
           {error && (
             <div
               className="form-error-banner"
@@ -175,9 +177,9 @@ const AdminAdsForm = () => {
           {/* Name + Placement row */}
           <div className="grid grid-2" style={{ marginBottom: 'var(--space-5)' }}>
             <div className="form-group">
-              <label className="form-label" htmlFor="ad-name">Ad Name</label>
+              <label className="form-label" htmlFor="field-creative-title">Ad Name</label>
               <input
-                id="ad-name"
+                id="field-creative-title"
                 name="name"
                 type="text"
                 className="form-input"
@@ -189,9 +191,9 @@ const AdminAdsForm = () => {
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="ad-placement">Placement</label>
+              <label className="form-label" htmlFor="field-slot-placement">Placement</label>
               <select
-                id="ad-placement"
+                id="field-slot-placement"
                 name="placement"
                 className="form-input"
                 value={form.placement}
@@ -233,12 +235,12 @@ const AdminAdsForm = () => {
             <div className="form-group">
               <label
                 className="form-label"
-                htmlFor="ad-status"
+                htmlFor="field-creative-active"
                 style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', cursor: 'pointer', width: 'fit-content' }}
               >
                 <span className="toggle-switch">
                   <input
-                    id="ad-status"
+                    id="field-creative-active"
                     name="status"
                     type="checkbox"
                     checked={form.status}
@@ -282,12 +284,12 @@ const AdminAdsForm = () => {
 
             {/* Priority input */}
             <div className="form-group">
-              <label className="form-label" htmlFor="ad-priority">
+              <label className="form-label" htmlFor="field-creative-priority">
                 Priority
                 <span style={{ fontWeight: 400, color: 'var(--color-text-muted)', marginLeft: 4 }}>(optional — 1 = highest)</span>
               </label>
               <input
-                id="ad-priority"
+                id="field-creative-priority"
                 name="priority"
                 type="number"
                 className="form-input"
@@ -306,7 +308,7 @@ const AdminAdsForm = () => {
           {/* Ad Code textarea */}
           <div className="form-group" style={{ marginBottom: 'var(--space-5)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
-              <label className="form-label" htmlFor="ad-code" style={{ marginBottom: 0 }}>
+              <label className="form-label" htmlFor="field-embed-snippet" style={{ marginBottom: 0 }}>
                 Ad Code
               </label>
               <button
@@ -319,8 +321,8 @@ const AdminAdsForm = () => {
               </button>
             </div>
             <textarea
-              id="ad-code"
-              name="ad_code"
+              id="field-embed-snippet"
+              name="embed_snippet"
               className="form-input"
               placeholder={'Paste your full Adsterra or Google AdSense code here…\n\n<!-- Example Adsterra -->\n<script type="text/javascript" src="//..."></script>\n\n<!-- Example AdSense -->\n<ins class="adsbygoogle" ...></ins>\n<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>\n\n<!-- For redirect_click: just paste a link URL or HTML with href -->\n<a href="https://your-ad-url.com">Ad link</a>'}
               value={form.ad_code}
@@ -365,7 +367,7 @@ const AdminAdsForm = () => {
               type="submit"
               className="btn btn-primary"
               disabled={saving}
-              id="save-ad-btn"
+              id="btn-save-creative-embed"
             >
               <FiSave /> {saving ? 'Saving…' : isEdit ? 'Update Ad' : 'Create Ad'}
             </button>
