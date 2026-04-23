@@ -6,7 +6,7 @@ import logger from '../config/logger.js';
  */
 
 const SUSPICIOUS_PATTERNS = [
-  /(\%27)|(\')|(\-\-)|(\%23)|(#)/i,           // SQL injection
+  /(\%27)|(\')|(\-\-)|(\%23)/i,               // SQL injection markers (exclude raw # used in hex colors)
   /<script[^>]*>.*<\/script>/gi,               // XSS script tags
   /javascript\s*:/gi,                          // JavaScript protocol
   /on\w+\s*=/gi,                               // Event handlers
@@ -19,6 +19,28 @@ const SUSPICIOUS_PATTERNS = [
 
 const MAX_BODY_DEPTH = 5;
 const MAX_STRING_LENGTH = 10000;
+const SCRIPT_TAG_REGEX = /<script[^>]*>.*<\/script>/gi;
+
+const prepareDataForSecurityScan = (req, source) => {
+  // Admin ads endpoint intentionally accepts ad snippets with <script> tags.
+  // Keep other protections active and only neutralize this one field for scan.
+  if (
+    source.name === 'body' &&
+    req.originalUrl?.startsWith('/api/ads') &&
+    source.data &&
+    typeof source.data === 'object'
+  ) {
+    const cloned = { ...source.data };
+    for (const key of ['ad_code', 'embed_snippet']) {
+      if (typeof cloned[key] === 'string') {
+        cloned[key] = cloned[key].replace(SCRIPT_TAG_REGEX, '[script]');
+      }
+    }
+    return cloned;
+  }
+
+  return source.data;
+};
 
 /**
  * Deep-check all string values in request body/query/params for suspect patterns
@@ -60,7 +82,8 @@ export const suspiciousActivityDetector = (req, res, next) => {
 
   for (const source of sources) {
     if (!source.data) continue;
-    const match = containsSuspiciousContent(source.data);
+    const scanData = prepareDataForSecurityScan(req, source);
+    const match = containsSuspiciousContent(scanData);
     if (match) {
       logger.warn(`🚨 Suspicious activity detected`, {
         ip: req.ip,
