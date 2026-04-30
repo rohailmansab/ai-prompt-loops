@@ -54,7 +54,19 @@ const BlogDetail = () => {
     window.scrollTo(0, 0);
   }, [slug]);
 
-  if (loading) return <div className="loading-container" style={{ paddingTop: 'var(--header-height)' }}><div className="spinner"></div></div>;
+  if (loading) return (
+    <div className="page-enter" style={{ paddingTop: 'var(--header-height)' }}>
+      <div className="prompt-detail-hero" style={{ paddingBottom: 'var(--space-12)' }}>
+        <div className="container"><DetailHeroSkeleton /></div>
+      </div>
+      <section className="section">
+        <div className="container" style={{ maxWidth: '800px' }}>
+          <DetailContentSkeleton />
+          <DetailContentSkeleton />
+        </div>
+      </section>
+    </div>
+  );
   if (!post) return <div className="page-enter" style={{ paddingTop: 'var(--header-height)' }}><div className="container section"><div className="empty-state"><h2>Post Not Found</h2><Link to="/blog" className="btn btn-primary">Back to Blog</Link></div></div></div>;
 
   const tags = typeof post.tags === 'string' ? JSON.parse(post.tags) : (post.tags || []);

@@ -19,14 +19,32 @@ const Header = () => {
     setIsMobileMenuOpen(false);
   }, [location]);
 
-  // Lock body scroll when mobile menu is open
+  // Lock body scroll when mobile menu is open without jumping scroll position.
+  // Using position:fixed + saved scrollY instead of overflow:hidden which causes
+  // iOS/Android browsers to reset scroll to top.
   useEffect(() => {
     if (isMobileMenuOpen) {
-      document.body.classList.add('menu-open');
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.dataset.menuScrollY = String(scrollY);
     } else {
-      document.body.classList.remove('menu-open');
+      const scrollY = parseInt(document.body.dataset.menuScrollY || '0', 10);
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      delete document.body.dataset.menuScrollY;
+      window.scrollTo(0, scrollY);
     }
-    return () => document.body.classList.remove('menu-open');
+    return () => {
+      const scrollY = parseInt(document.body.dataset.menuScrollY || '0', 10);
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      delete document.body.dataset.menuScrollY;
+      if (scrollY) window.scrollTo(0, scrollY);
+    };
   }, [isMobileMenuOpen]);
 
   const navLinks = [

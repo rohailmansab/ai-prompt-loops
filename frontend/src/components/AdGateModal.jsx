@@ -1,69 +1,32 @@
 /**
- * AdGateModal — §1 / §6 Reusable fullscreen ad gate
+ * AdGateModal — §1 / §6 Reusable fullscreen ad gate (v2)
+ *
+ * Changes from v1:
+ *  - Ad rendered inside <iframe srcDoc> so scripts execute in context
+ *    and produce actual visual content (banners, video, etc.)
+ *  - Removed SCRIPT_REGISTRY / injectScripts / safeHtml (no longer needed)
  *
  * Props:
- *   placement  string   — ad placement key (e.g. 'tool_action')
- *   onUnlock   function — called when the user is allowed to proceed
- *   onClose    function — called when the modal is dismissed (without unlock)
- *   variant    string   — 'fullscreen' (default) | 'popup' (blog popup)
- *   countdownSeconds number — default 4 for tool_action, 3 for popup
- *
- * Flow:
- *   1. Fetch active ad for placement
- *   2. Start countdown timer (only while ad is >=50% in viewport)
- *   3. After countdown: show "Continue" / unlock button
- *   4. Track events: impression → view_complete | skip
+ *   placement        string   — ad placement key (e.g. 'tool_action')
+ *   onUnlock         function — called when the user is allowed to proceed
+ *   onClose          function — called when the modal is dismissed (without unlock)
+ *   variant          string   — 'fullscreen' (default) | 'popup' (blog popup)
+ *   countdownSeconds number   — default 4 for tool_action, 3 for popup
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { adsAPI } from '../services/api';
 import './AdGateModal.css';
 
-/* ── Script injection (fire-and-forget, deduped) ─────── */
-const SCRIPT_REGISTRY = new Set();
-const injectScripts = (htmlString) => {
-  if (!htmlString) return { html: '', error: false };
-  try {
-    const scriptTagRe = /<script[\s\S]*?(?:<\/script>|(?<=\/)>)/gi;
-    const srcRe = /src\s*=\s*["']([^"']+)["']/i;
-    const inlineContentRe = /<script[^>]*>([\s\S]*?)<\/script>/i;
-    const matches = htmlString.match(scriptTagRe) || [];
-    matches.forEach((scriptTag) => {
-      const srcMatch = scriptTag.match(srcRe);
-      if (srcMatch) {
-        const src = srcMatch[1];
-        if (!SCRIPT_REGISTRY.has(src)) {
-          SCRIPT_REGISTRY.add(src);
-          const el = document.createElement('script');
-          el.src = src; el.async = true; el.defer = true;
-          document.head.appendChild(el);
-        }
-      } else {
-        const inlineMatch = scriptTag.match(inlineContentRe);
-        if (inlineMatch && inlineMatch[1].trim()) {
-          const content = inlineMatch[1].trim();
-          const key = `inline:${content.substring(0, 80)}`;
-          if (!SCRIPT_REGISTRY.has(key)) {
-            SCRIPT_REGISTRY.add(key);
-            const el = document.createElement('script');
-            el.textContent = content;
-            document.head.appendChild(el);
-          }
-        }
-      }
-    });
-    return { html: htmlString.replace(scriptTagRe, '').trim(), error: false };
-  } catch (err) {
-    console.warn('[AdGateModal] Script injection error:', err.message);
-    return { html: '', error: true };
-  }
-};
-
 /* ── Track ad event (fire-and-forget) ─────────────────── */
 const fireEvent = (adId, placement, eventType) => {
   if (!adId) return;
   adsAPI.trackEvent({ ad_id: adId, placement, event_type: eventType }).catch(() => {});
 };
+
+/* ── Build iframe srcdoc from raw ad code ─────────────── */
+const buildSrcDoc = (adCode) =>
+  `<!DOCTYPE html><html><head><style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#1a1a28;display:flex;align-items:center;justify-content:center;min-height:100vh;overflow:hidden;}</style></head><body>${adCode}</body></html>`;
 
 /* ── SVG countdown ring values ─────────────────────────── */
 const RADIUS = 22;
@@ -81,7 +44,7 @@ const AdGateModal = ({
   const [ad, setAd] = useState(null);
   const [adLoaded, setAdLoaded] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TOTAL);
-  const [isVisible, setIsVisible] = useState(false); // >=50% in viewport
+  const [isVisible, setIsVisible] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
   const [impressionFired, setImpressionFired] = useState(false);
 
@@ -111,11 +74,6 @@ const AdGateModal = ({
       fireEvent(ad.id, placement, 'impression');
     }
   }, [ad, placement, impressionFired]);
-
-  /* ── Inject scripts once ad fetched ─────────────────── */
-  useEffect(() => {
-    if (ad?.ad_code) injectScripts(ad.ad_code);
-  }, [ad]);
 
   /* ── Visibility observer (>=50% in viewport) ─────────── */
   useEffect(() => {
@@ -149,7 +107,7 @@ const AdGateModal = ({
 
   /* ── Handle skip/continue ─────────────────────────────── */
   const handleContinue = useCallback(() => {
-    if (!unlocked) return; // safety guard
+    if (!unlocked) return;
     fireEvent(ad?.id, placement, 'view_complete');
     onUnlock?.();
   }, [unlocked, ad, placement, onUnlock]);
@@ -161,9 +119,7 @@ const AdGateModal = ({
 
   /* ── Escape key closes (as skip) ─────────────────────── */
   useEffect(() => {
-    const handleKey = (e) => {
-      if (e.key === 'Escape') handleSkip();
-    };
+    const handleKey = (e) => { if (e.key === 'Escape') handleSkip(); };
     document.addEventListener('keydown', handleKey);
     return () => document.removeEventListener('keydown', handleKey);
   }, [handleSkip]);
@@ -174,11 +130,8 @@ const AdGateModal = ({
     return () => { document.body.style.overflow = ''; };
   }, []);
 
-  /* ── Safe HTML (scripts stripped; injected separately) ── */
-  const safeHtml = ad?.ad_code ? injectScripts(ad.ad_code).html : '';
-
   /* ── Progress values for ring ─────────────────────────── */
-  const progress = (TOTAL - timeLeft) / TOTAL; // 0 → 1
+  const progress = (TOTAL - timeLeft) / TOTAL;
   const dash = CIRCUMFERENCE * (1 - progress);
 
   const isPopup = variant === 'popup';
@@ -244,17 +197,20 @@ const AdGateModal = ({
             </div>
           )}
 
-          {adLoaded && ad && safeHtml && (
-            <div
+          {adLoaded && ad && (
+            <iframe
+              srcDoc={buildSrcDoc(ad.ad_code)}
               className="adgate-ad-inner"
-              dangerouslySetInnerHTML={{ __html: safeHtml }}
+              style={{ width: '100%', height: '250px', border: 'none', display: 'block', borderRadius: '8px' }}
+              sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-popups-to-escape-sandbox"
+              title="Sponsored advertisement"
             />
           )}
 
-          {adLoaded && (!ad || !safeHtml) && (
+          {adLoaded && !ad && (
             <div className="adgate-no-ad">
               <div className="adgate-no-ad-icon">📡</div>
-              <p>Our sponsor's ad is loading…</p>
+              <p>Our sponsor&apos;s ad is loading…</p>
               <p style={{ fontSize: '0.8rem', marginTop: '0.5rem', opacity: 0.7 }}>
                 Please wait {timeLeft > 0 ? `${timeLeft}s` : 'a moment'}
               </p>

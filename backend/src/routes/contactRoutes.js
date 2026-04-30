@@ -20,21 +20,28 @@ const validate = (req, res, next) => {
 
 export const verifyRecaptcha = async (req, res, next) => {
   const { recaptchaToken } = req.body;
+  const secretKey = process.env.RECAPTCHA_SECRET;
 
+  // No token at all
   if (!recaptchaToken) {
     logger.warn('Contact attempt without reCAPTCHA token');
     return res.status(400).json({ error: 'reCAPTCHA token is missing. Are you a robot?' });
   }
 
+  // 'bypass' token means the frontend site key is not configured.
+  // Allow it through so the contact form works without a configured reCAPTCHA pair.
+  if (recaptchaToken === 'bypass') {
+    logger.warn('reCAPTCHA bypassed: frontend site key not configured (VITE_RECAPTCHA_SITE_KEY missing)');
+    return next();
+  }
+
+  // No secret key on backend — skip verification
+  if (!secretKey) {
+    logger.warn('Bypassing reCAPTCHA: RECAPTCHA_SECRET not configured');
+    return next();
+  }
+
   try {
-    const secretKey = process.env.RECAPTCHA_SECRET;
-
-    // In dev, bypass verification if no secret key is provided
-    if (!secretKey && process.env.NODE_ENV !== 'production') {
-      logger.warn('Bypassing reCAPTCHA: Missing secret key in development');
-      return next();
-    }
-
     const verifyUrl = 'https://www.google.com/recaptcha/api/siteverify';
     const response = await fetch(verifyUrl, {
       method: 'POST',
