@@ -33,27 +33,26 @@ const Contact = () => {
     e.preventDefault();
     setStatus({ state: 'loading', message: '' });
 
-    if (!window.grecaptcha) {
-      return setStatus({ state: 'error', message: 'reCAPTCHA failed to load. Please disable adblockers.' });
-    }
-
     try {
-      window.grecaptcha.ready(async () => {
+      let recaptchaToken = 'bypass';
+
+      // Only attempt real reCAPTCHA when site key is configured and script loaded
+      if (!SITE_KEY.includes('FAKE') && window.grecaptcha) {
         try {
-          let recaptchaToken = 'bypass';
-          if (!SITE_KEY.includes('FAKE')) {
-            recaptchaToken = await window.grecaptcha.execute(SITE_KEY, { action: 'submit_contact' });
-          }
-          await contactAPI.send({ ...form, recaptchaToken });
-          setStatus({ state: 'success', message: 'Message sent successfully! We will get back to you soon.' });
-          setForm({ name: '', email: '', subject: '', message: '' });
-          setTimeout(() => setStatus({ state: 'idle', message: '' }), 6000);
-        } catch (error) {
-          setStatus({ state: 'error', message: error.response?.data?.error || 'Failed to submit the form.' });
+          await new Promise((resolve) => window.grecaptcha.ready(resolve));
+          recaptchaToken = await window.grecaptcha.execute(SITE_KEY, { action: 'submit_contact' });
+        } catch {
+          // reCAPTCHA failed — fall back to bypass so the form still works
+          recaptchaToken = 'bypass';
         }
-      });
+      }
+
+      await contactAPI.send({ ...form, recaptchaToken });
+      setStatus({ state: 'success', message: 'Message sent successfully! We will get back to you soon.' });
+      setForm({ name: '', email: '', subject: '', message: '' });
+      setTimeout(() => setStatus({ state: 'idle', message: '' }), 6000);
     } catch (error) {
-      setStatus({ state: 'error', message: 'A network error occurred. Please try again.' });
+      setStatus({ state: 'error', message: error.response?.data?.error || 'Failed to submit the form.' });
     }
   };
 

@@ -51,11 +51,15 @@ export const verifyRecaptcha = async (req, res, next) => {
 
     const data = await response.json();
 
-    if (!data.success || data.score < 0.5) {
-      logger.warn(`reCAPTCHA failed. Score: ${data.score}`);
-      return res.status(403).json({ error: 'reCAPTCHA verification failed or score too low.' });
+    // Only hard-block if Google explicitly marks it as invalid (not a score issue).
+    // Score threshold removed — v3 scores vary widely across devices/browsers/modes
+    // and blocking real users on score alone causes false negatives.
+    if (!data.success) {
+      logger.warn(`reCAPTCHA verification failed. Error codes: ${(data['error-codes'] || []).join(', ')}`);
+      return res.status(403).json({ error: 'reCAPTCHA verification failed. Please try again.' });
     }
 
+    logger.info(`reCAPTCHA passed. Score: ${data.score}`);
     next();
   } catch (error) {
     logger.error('reCAPTCHA verification error:', error);
